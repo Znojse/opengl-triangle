@@ -1,0 +1,71 @@
+{
+    "version": 9,
+    "cmakeMinimumRequired": {
+        "major": 3,
+        "minor": 29,
+        "patch": 0
+    },
+    "include": ["./ConanPresets.json"],
+    "configurePresets": [
+        {
+            "name": "vtCommon",
+            "description": "Common configuration for the opengl triangle.",
+            "inherits": "conan-default",
+            "hidden": true,
+            "binaryDir": "${sourceDir}/build/opengl-triangle",
+            "toolchainFile": "${sourceDir}/build/generators/conan_toolchain.cmake",
+            "cacheVariables": {
+                "CMAKE_EXPORT_COMPILE_COMMANDS": { "type": "BOOL",   "value": true },
+                "CMAKE_CONFIGURATION_TYPES":     { "type": "STRING", "value": "Debug;Release" }
+            }
+        },
+        {
+            "name": "vtMSVC",
+            "description": "The MSVC configuration for the opengl triangle using Visual Studio generator.",
+            "inherits": "vtCommon",
+            "generator": "Visual Studio 17 2022",
+            "cacheVariables": {
+                "CMAKE_C_FLAGS_DEBUG_INIT":      { "type": "STRING", "value": "/W4 /WX /Od" },
+                "CMAKE_C_FLAGS_RELEASE_INIT":    { "type": "STRING", "value": "/W4 /WX /O2" },
+                "CMAKE_CXX_FLAGS_DEBUG_INIT":    { "type": "STRING", "value": "/W4 /WX /Od" },
+                "CMAKE_CXX_FLAGS_RELEASE_INIT":  { "type": "STRING", "value": "/W4 /WX /O2" }
+            }
+        }
+    ],
+    "buildPresets": [
+        { "name": "vtMSVCDebug",      "configurePreset": "vtMSVC",        "configuration": "Debug",   "inherits": "conan-debug" },
+        { "name": "vtMSVCRelease",    "configurePreset": "vtMSVC",        "configuration": "Release", "inherits": "conan-release" }
+    ],
+    "testPresets": [
+        { "name": "vtMSVCDebug",      "configurePreset": "vtMSVC",        "configuration": "Debug",   "inherits": "conan-debug" },
+        { "name": "vtMSVCRelease",    "configurePreset": "vtMSVC",        "configuration": "Release", "inherits": "conan-release" }
+    ],
+    "workflowPresets": [
+        {
+            "name": "vtMSVCDebug",
+            "steps": [
+                { "type": "configure", "name": "vtMSVC" },
+                { "type": "build",     "name": "vtMSVCDebug" },
+                { "type": "test",      "name": "vtMSVCDebug" }
+            ]
+        },
+        {
+            "name": "vtMSVCRelease",
+            "steps": [
+                { "type": "configure", "name": "vtMSVC" },
+                { "type": "build",     "name": "vtMSVCRelease" },
+                { "type": "test",      "name": "vtMSVCRelease" }
+            ]
+        },
+        {
+            "name": "vtMSVCAll",
+            "steps": [
+                { "type": "configure", "name": "vtMSVC" },
+                { "type": "build",     "name": "vtMSVCDebug" },
+                { "type": "build",     "name": "vtMSVCRelease" },
+                { "type": "test",      "name": "vtMSVCDebug" },
+                { "type": "test",      "name": "vtMSVCRelease" }
+            ]
+        }
+    ]
+}
